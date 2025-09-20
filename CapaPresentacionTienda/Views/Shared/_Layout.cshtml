@@ -1,0 +1,112 @@
+﻿@using CapaEntidad
+@using CapaPresentacionTienda.Models
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CapaPresentacionTienda</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/CapaPresentacionTienda.styles.css" asp-append-version="true" />
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" crossorigin="anonymous">
+</head>
+<body class="d-flex flex-column min-vh-100">
+    @{
+        var cliente = Context.Session.GetObjectFromJson<Cliente>("Cliente");
+    }
+
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="#!">Mi tienda</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="@Url.Action("Index", "Tienda")">Inicio</a></li>
+                    @* <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#!">All Products</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item" href="#!">Popular Items</a></li>
+                            <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
+                        </ul>
+                    </li> *@
+                </ul>
+                <form class="d-flex">
+                    @if(cliente == null)
+                    {
+                        <a class="btn btn-outline-dark" aria-current="page" href="@Url.Action("Index", "Acceso")"><i class="fas fa-sign-out-alt me-1"></i>Iniciar Sesión</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-dark" href="@Url.Action("Carrito", "Tienda")">
+                            <i class="fas fa-shopping-cart me-1"></i>
+                            Cart
+                            <span class="badge bg-dark text-white ms-1 rounded-pill" id="cantidadcarrito">0</span>
+                        </a>
+
+                        <ul class="navbar-nav ms-auto me-0 me-md-3 my-2 my-md-0">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="#!"><b>@User.Identity.Name</b></a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("MisCompras", "Tienda")">Mis Compras</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("CerrarSesion", "Acceso")">Cerrar Sesión</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    }
+                   
+                </form>
+            </div>
+        </div>
+    </nav>
+    @RenderBody()
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - CapaPresentacionTienda - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+
+        $(document).ready(function()
+        {
+            MostrarCantidadCarrito();
+        }      
+        )
+
+        function MostrarCantidadCarrito()
+        {
+            if($("#cantidadcarrito").length > 0)
+            {
+                $.ajax({
+                    url: '@Url.Action("CantidadEnCarrito", "Tienda")',
+                    type: 'GET',
+                    success: function (data) {
+                        $("#cantidadcarrito").text(data.cantidad);
+                    },
+                    error: function () {
+                        console.error("Error al obtener la cantidad del carrito.");
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
